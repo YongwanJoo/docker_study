@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: auth-service
+  
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 3600000 # 1 hour
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:msa_db}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# 관측성(Zipkin) 설정
+management:
+  tracing:
+    sampling:
+      probability: 1.0 # 100% 추적 (데모용)
+  zipkin:
+    tracing:
+      endpoint: "http://localhost:${ZIPKIN_PORT:9411}/api/v2/spans"
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus

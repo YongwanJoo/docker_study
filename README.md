@@ -1,5 +1,143 @@
+# Container Infra Project(Docker + Monitoring)
+
+## 프로젝트 개요
+Docker 기반으로 애플리케이션을 컨테이너화하고,
+이미지 최적화 및 모니터링 시스템을 구축하여 운영 관점의 인프라 환경을 구성
+
+---
+
 ## 목차
 
-### 0 [Docker 기본 개념](https://github.com/YongwanJoo/docker_study/blob/main/docs/Docker%20기본%20개념.md)
+0. [Docker 기본 개념](./docs/Docker 기본 개념.md)
+1. [아키텍처](#-아키텍처)
+2. [기술 스택](#-기술-스택)
+3. [📌 주요 내용](#-주요-내용)
+4. [성능 개선 (이미지 최적화)](#-성능-개선-이미지-최적화)
+5. [모니터링](#-모니터링)
 
+---
 
+## 아키텍처
+
+```mermaid
+graph LR
+    User((User)) --> App[Auth Service Container]
+    App --> DB[(PostgreSQL)]
+    App --> Redis[(Redis)]
+    
+    subgraph Monitoring_Stack
+        cA[cAdvisor] --> Prom[Prometheus]
+        Prom --> Graf[Grafana]
+    end
+    
+    App -.-> cA
+```
+
+---
+
+## 기술 스택
+
+- Container: Docker, docker-compose
+- Monitoring: Prometheus, Grafana, cAdvisor
+- Backend: Spring Boot 3.x(Java 17)
+- Infra: Linux (Ubuntu)
+
+---
+
+## 📌 주요 내용
+
+- Docker 기반 멀티 컨테이너 환경 구성
+- Dockerfile 최적화를 통한 이미지 경량화
+- Prometheus + Grafana 기반 모니터링 시스템 구축
+- 컨테이너 리소스 사용량 시각화 
+
+---
+
+## 성능 개선 (이미지 최적화)
+
+### 문제 상황
+- 초기 Docker 이미지 크기가 과도하게 커서 배포 시간이 오래 소요됨
+
+### 해결
+- **Multi-stage Build**: 빌드 시에만 필요한 JDK와 Gradle 도구를 최종 이미지에서 제거하여 보안성을 높이고 용량을 절감
+- **불필요한 패키지 제거**: alpine 기반의 경량 이미지를 베이스 이미지로 사용하여 OS 레벨의 취약점과 크기를 최소화
+- **Layer Cache 최적화**: 종속성 설정 파일(gradlew, build.gradle 등)을 소스 코드보다 먼저 복사하여, 코드 수정 시에도 라이브러리 다운로드 단계를 건너뛰도록 구성
+
+### Worst vs Best Case 비교
+
+#### Worst Case (Dockerfile)
+```Dockerfile
+# 최적화 없는 단일 스테이지 방식
+FROM openjdk:17-jdk-slim 
+WORKDIR /app
+
+# 프로젝트 전체를 한꺼번에 복사 (레이어 캐싱 불가)
+COPY . .
+
+# 빌드 실행 (최종 이미지에 빌드 도구가 남음)
+RUN ./gradlew :auth-service:build -x test
+
+EXPOSE 8082
+ENTRYPOINT ["java", "-jar", "auth-service/build/libs/app.jar"]
+```
+
+#### Best Case (Dockerfile)
+```Dockerfile
+# Stage 1: Builder (빌드 환경)
+FROM gradle:8.5-jdk17-alpine AS builder
+WORKDIR /app
+
+# 종속성 파일을 먼저 복사하여 레이어 캐싱 활용
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
+
+# 소스 코드 복사 및 빌드
+COPY auth-service ./auth-service
+RUN chmod +x gradlew
+RUN ./gradlew :auth-service:build -x test --no-daemon
+
+# Stage 2: Runner (경량 실행 환경)
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+# 빌드 결과물(jar)만 복사하여 용량 최소화
+COPY --from=builder /app/auth-service/build/libs/*.jar app.jar
+
+EXPOSE 8082
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+| 구분 | Worst Case (비최적화) | Best Case (최적화 완료) | 개선 결과 |
+| --- | --- | --- | --- |
+| Dockerfile 전략 | 단일 스테이지, 일반 JDK 사용 | Multi-stage, Alpine JRE | 보안 및 용량 최적화 |
+| 이미지 크기 | 약 680MB (Build Tool 포함) | 약 185MB | 약 73% 감소 |
+| 빌드 시간 | 매번 전체 라이브러리 다운로드 | 캐시 활용으로 소스 변경 시 즉시 빌드 | 배포 생산성 향상 | 
+
+---
+
+## 📈 모니터링
+
+> Prometheus를 통해 컨테이너 메트릭을 수집하고, Grafana를 활용하여 시각화 환경을 구축함
+
+### 지표 수집 및 시각화
+- **Spring Boot Actuator**: 어플리케이션 내부 지표(Heap, CPU, Thread)를 Prometheus 포맷으로 노출
+- **cAdvisor**: 컨테이너 리소스 사용량(CPU, Memory, Network, Disk)을 수집
+- **Prometheus**: 노출된 엔드포인트에서 메트릭 주기적으로 수집
+- **Grafana**: 수집된 메트릭을 시각화하여 대시보드 구성
+
+### 예시 화면
+
+---
+
+## 문제 해결
+
+- Layer Caching을 통해 빌드 속도 개선
+  - **문제**: 소스 코드 한 줄만 수정해도 매 번 라이브러리 다운로드 시간 소요
+  - **해결**: 종속성 파일(gradlew, build.gradle 등)을 소스 코드보다 먼저 복사하여, 코드 수정 시에도 라이브러리 다운로드 단계를 건너뛰도록 구성
+
+- Multi-stage Build를 통한 이미지 경량화
+  - **문제**: 빌드 도구(JDK, Gradle)가 포함된 이미지를 사용
+  - **해결**: 빌드 시에만 필요한 JDK와 Gradle 도구를 최종 이미지에서 제거하여 보안성을 높이고 용량을 절감
+
+- 실행 이미지 경량화
+  - **문제**: 실행 이미지가 너무 큼
+  - **해결**: 실행 이미지를 경량화하여 용량을 절감
