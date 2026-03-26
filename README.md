@@ -97,9 +97,9 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 | 구분 | Worst Case (비최적화) | Best Case (최적화 완료) | 개선 결과 |
 | --- | --- | --- | --- |
-| Dockerfile 전략 | 단일 스테이지, 일반 JDK 사용 | Multi-stage, Alpine JRE | 보안 및 용량 최적화 |
-| 이미지 크기 | 약 680MB (Build Tool 포함) | 약 185MB | 약 73% 감소 |
-| 빌드 시간 | 매번 전체 라이브러리 다운로드 | 캐시 활용으로 소스 변경 시 즉시 빌드 | 배포 생산성 향상 | 
+| Dockerfile 전략 | 단일 스테이지, 일반 JDK 사용 | Multi-stage, Layer Caching | 빌드 구조 최적화 |
+| 이미지 크기 | 약 1.62GB | 약 1.25GB | 약 23% 감소 |
+| 빌드 시간 | 30s | 26s | 배포 생산성 향상 | 
 
 ---
 

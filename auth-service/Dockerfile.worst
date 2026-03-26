@@ -1,0 +1,15 @@
+# ❌ Worst Case
+
+FROM gradle:8.5-jdk17
+
+WORKDIR /app
+
+# 전체 복사 (캐시 다 깨짐)
+COPY . .
+
+# 매번 dependency 다운로드 (gradle 사용)
+RUN gradle -p auth-service build -x test --no-daemon
+
+# 불필요하게 JDK 포함된 상태로 실행
+EXPOSE 8082
+CMD ["java", "-jar", "auth-service/build/libs/auth-service-0.0.1-SNAPSHOT.jar"]
