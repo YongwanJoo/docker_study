@@ -20,7 +20,7 @@ Docker 기반으로 애플리케이션을 컨테이너화하고,
 
 ## 아키텍처
 
-<img width="4289" height="1822" alt="User Authentication-2026-03-26-051807" src="https://github.com/user-attachments/assets/94457874-c29f-444e-8f2a-0686add7bd5e" />
+<img width="3610" height="1822" alt="User Authentication-2026-03-26-071833" src="https://github.com/user-attachments/assets/b5db29c8-ef3b-40b9-ba7e-4b7384a53366" />
 
 
 ---
@@ -176,3 +176,18 @@ Jenkins를 활용하여 빌드 및 최적화 실험을 자동화하고 Docker Hu
 
 ### 모니터링 연동
 - **Jenkins Prometheus Metrics**: Jenkins에 `Prometheus Metrics` 플러그인을 설치하면, 빌드 성공/실패율 및 소요 시간을 Prometheus로 수집하여 Grafana에서 시각화 가능
+
+
+### Docker Hub Credentials
+
+<img width="1375" height="754" alt="스크린샷 2026-03-26 오후 4 14 40" src="https://github.com/user-attachments/assets/ad9ee849-17f5-4ea1-b69d-5479bcce6832" />
+<img width="729" height="500" alt="스크린샷 2026-03-26 오후 4 14 58" src="https://github.com/user-attachments/assets/b0005964-b4a1-4829-9682-48c5a5007867" />
+
+### Jenkins Credentials
+
+<img width="1395" height="347" alt="스크린샷 2026-03-26 오후 4 15 47" src="https://github.com/user-attachments/assets/8d33e58c-0bbc-4d91-8ee3-63cee2ada1f6" />
+
+<img width="1190" height="787" alt="스크린샷 2026-03-26 오후 4 16 42" src="https://github.com/user-attachments/assets/70cb2f27-2ecc-4ecf-b89f-9555b62dfd0d" />
+<img width="705" height="231" alt="스크린샷 2026-03-26 오후 4 17 23" src="https://github.com/user-attachments/assets/471e9598-f338-43f8-a2a8-c1b9aa578bc1" />
+
+---
