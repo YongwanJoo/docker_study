@@ -5,7 +5,7 @@ scrape_configs:
   - job_name: 'auth-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['auth-service:8082']
+      - targets: ['auth-service-best:8082', 'auth-service-worst:8082']
 
   - job_name: 'cadvisor'
     static_configs:

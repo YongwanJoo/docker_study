@@ -97,9 +97,10 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 | 구분 | Worst Case (비최적화) | Best Case (최적화 완료) | 개선 결과 |
 | --- | --- | --- | --- |
-| Dockerfile 전략 | 단일 스테이지, 일반 JDK 사용 | Multi-stage, Layer Caching | 빌드 구조 최적화 |
-| 이미지 크기 | 약 1.62GB | 약 1.25GB | 약 23% 감소 |
-| 빌드 시간 | 30s | 26s | 배포 생산성 향상 | 
+| Dockerfile 전략 | 단일 스테이지, 전체 복사 | Multi-stage, Layer Caching | 빌드 구조 최적화 |
+| 이미지 크기 | 약 1.62GB | 약 1.25GB | **약 23% 감소** |
+| 최초 빌드 시간 | 약 62s | 약 55s | 빌드 속도 개선 |
+| **재빌드 시간 (캐시)** | 약 62s (매번 전체 빌드) | **약 2s** | **약 96% 시간 단축** |
 
 ---
 
@@ -112,6 +113,19 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 - **cAdvisor**: 컨테이너 리소스 사용량(CPU, Memory, Network, Disk)을 수집
 - **Prometheus**: 노출된 엔드포인트에서 메트릭 주기적으로 수집
 - **Grafana**: 수집된 메트릭을 시각화하여 대시보드 구성
+
+### 실시간 성능 비교 (Worst vs Best)
+두 서비스를 동시에 기동하여 리소스 점유율을 실시간으로 비교 가능합니다.
+- **CPU 점유율 (`process_cpu_usage`)**: 초기 기동 및 부하 발생 시 JVM 최적화(JIT) 과정에서의 차이 관찰
+- **메모리 사용량 (`jvm_memory_used_bytes`)**: 힙 메모리 및 메타스페이스 점유 양상 비교
+- **요청 처리량 (`http_server_requests_seconds_count`)**: 동일 부하 상황에서의 처리 안정성 확인
+
+### 캐시 활용 모니터링 (Redis + Lettuce)
+Spring Boot의 Lettuce 드라이버가 제공하는 메트릭을 통해 Redis 캐시 성능을 추적합니다.
+- **주요 메트릭**:
+  - `lettuce_command_firstresponse_seconds_count`: Redis 명령어 실행 횟수 (Get/Set 비율 확인 가능)
+  - `lettuce_command_firstresponse_seconds_sum`: 명령어 응답 시간 합계 (지연 시간 분석)
+- **분석 내용**: 애플리케이션에서 발생하는 캐시 요청의 빈도와 지연 시간을 모니터링하여 데이터베이스 부하 분산 효과를 검증
 
 ### 예시 화면
 <img width="1406" height="444" alt="스크린샷 2026-03-26 오후 2 53 08" src="https://github.com/user-attachments/assets/4706cc22-0341-4e35-b906-e8b768e26bfb" />
