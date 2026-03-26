@@ -8,7 +8,7 @@ Docker 기반으로 애플리케이션을 컨테이너화하고,
 
 ## 목차
 
-0. [Docker 기본 개념](./docs/Docker 기본 개념.md)
+0. [Docker 기본 개념](https://github.com/YongwanJoo/docker_study/blob/main/docs/Docker%20기본%20개념.md)
 1. [아키텍처](#-아키텍처)
 2. [기술 스택](#-기술-스택)
 3. [📌 주요 내용](#-주요-내용)
@@ -114,6 +114,14 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 - **Grafana**: 수집된 메트릭을 시각화하여 대시보드 구성
 
 ### 예시 화면
+<img width="1406" height="444" alt="스크린샷 2026-03-26 오후 2 53 08" src="https://github.com/user-attachments/assets/4706cc22-0341-4e35-b906-e8b768e26bfb" />
+
+<img width="1406" height="501" alt="스크린샷 2026-03-26 오후 2 53 34" src="https://github.com/user-attachments/assets/143d783c-ac06-4782-9f98-adacd1783f6b" />
+
+<img width="569" height="461" alt="스크린샷 2026-03-26 오후 2 54 26" src="https://github.com/user-attachments/assets/0867bd7a-bc5d-4ab6-8008-bf1a796b242c" />
+
+<img width="570" height="608" alt="스크린샷 2026-03-26 오후 2 54 01" src="https://github.com/user-attachments/assets/964dc306-1d86-4d29-9051-b28c4b5e94c9" />
+
 
 ---
 
