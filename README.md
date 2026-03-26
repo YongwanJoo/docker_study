@@ -1,4 +1,4 @@
-# Container Infra Project(Docker + Monitoring)
+# Container Infra Build Optimization
 
 ## 프로젝트 개요
 Docker 기반으로 애플리케이션을 컨테이너화하고,
