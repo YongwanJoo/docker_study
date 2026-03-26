@@ -19,19 +19,8 @@ Docker 기반으로 애플리케이션을 컨테이너화하고,
 
 ## 아키텍처
 
-```mermaid
-graph LR
-    User((User)) --> App[Auth Service Container]
-    App --> DB[(PostgreSQL)]
-    App --> Redis[(Redis)]
-    
-    subgraph Monitoring_Stack
-        cA[cAdvisor] --> Prom[Prometheus]
-        Prom --> Graf[Grafana]
-    end
-    
-    App -.-> cA
-```
+<img width="4289" height="1822" alt="User Authentication-2026-03-26-051807" src="https://github.com/user-attachments/assets/94457874-c29f-444e-8f2a-0686add7bd5e" />
+
 
 ---
 
